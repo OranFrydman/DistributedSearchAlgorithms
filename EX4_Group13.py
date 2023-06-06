@@ -88,6 +88,7 @@ class Agent:
         total_penalty = 0
         min_penalty = self.my_penalty
         best_var = self.variable
+
         for optional_variable in range(DOMAINS):
             if total_penalty < min_penalty:
                 for mail in self.mailbox.box:
@@ -110,13 +111,12 @@ class Message:
 class MailBox:
     def __init__(self):
         self.box = []
-        self.history = []
+
 
     def add_mail(self, mail):
         self.box.append(mail)
 
     def clear_box(self):
-        self.history.extend(self.box)
         self.box = []
 class Neighborhood:
     def __init__(self, agent1, agent2):
@@ -202,9 +202,9 @@ class SolverDSA(AllocationProblem):
             if i > 0:
                 self.distribute_messages()
             for agent in self.agents:
-                best_var = agent.read_all_messages_find_best_var()
                 rand = random.random()
                 if rand < self.p:
+                    best_var = agent.read_all_messages_find_best_var()
                     agent.change_var(best_var)
             for agent in self.agents:
                 agent.init_penalty(clean_mail=True)
@@ -214,12 +214,12 @@ class SolverDSA(AllocationProblem):
         return score
 
 # init variables
-seed = 10
+seed = 0
 np.random.seed(seed)
-iterations = 50
+iterations = 100
 runs = 1
-agents_number = 3
-k = 1  # Make Neighbor
+agents_number = 5
+k = 0.5  # Make Neighbor
 p_change_DSA = 0.05
 accumulated_score_mgm = [0] * iterations
 accumulated_score1 = [0] * iterations
@@ -228,36 +228,6 @@ accumulated_score3 = [0] * runs
 agents = []
 P_list = []
 score_by_p_list = []
-# for i in range(runs):
-#     status = (i / runs) * 100
-#     if status % 10 == 0:
-#         print(f'loading P Graph... {status} %')
-#         # initializing the agents
-#     for a in range(agents_number):
-#         agent = Agent()
-#         agents.append(agent)
-#     # determine neighbors for each agent - build the matrices
-#     all_neighborhoods = build_all_neighbors(agents, k)
-#     # Creating the Problems
-#     agents_temp = copy.deepcopy(agents)
-#     for j in range(runs):
-#         if j == i:
-#             P_list.append(p_change_DSA)
-#         DSA3 = SolverDSA(agents, iterations, p=p_change_DSA)
-#         score_by_p_list = DSA3.solve()
-#         accumulated_score3[j] = score_by_p_list[-1] + accumulated_score3[j]
-#         p_change_DSA += CONST_P
-#         agents = copy.deepcopy(agents_temp)
-#         # reset variables
-#     score3 = []
-#     agents = []
-#     Agent.AGENT_ID = 0
-#     p_change_DSA = 0
-# average_score3 = np.array(accumulated_score3) / runs
-# df2 = pd.DataFrame({'p': P_list, 'Penalty Score': average_score3})
-# b = df2.plot.scatter(x='p', y='Penalty Score')
-
-
 for i in range(runs):
     status = (i / runs) * 100
     if status % 10 == 0:
@@ -295,8 +265,6 @@ for i in range(runs):
         agents3 = copy.deepcopy(temp_agents)
         # reset variables
     score3 = []
-    agents = []
-    Agent.AGENT_ID = 0
     p_change_DSA = 0.05
     # reset variables
     score1 = []
@@ -306,6 +274,7 @@ for i in range(runs):
     agents = []
     all_neighborhoods = []
     Agent.AGENT_ID = 0
+    seed+=1
 
 # # Preparing plots
 average_score1 = accumulated_score1 / runs
